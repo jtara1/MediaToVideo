@@ -12,8 +12,8 @@ sys.path.append(os.path.abspath(
         os.path.abspath(__file__),
         '../..')))
 from GetMediaFiles.get_media_files import GetMediaFiles
-from MediaToVideo.serialization import RenderDatum, Serialization
-from MediaToVideo.heap import Heap
+from serialization import RenderDatum, Serialization
+from heap import Heap
 
 
 class MediaToVideo:

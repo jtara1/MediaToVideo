@@ -1,4 +1,4 @@
-from MediaToVideo.serialization import Serialization
+from serialization import Serialization
 from heapq import *
 import os
 
