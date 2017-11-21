@@ -7,13 +7,13 @@ from pprint import pprint
 
 # lazy way to import submodule whose path is in ../GetMediaFiles relative to
 # the file path of this file (__file__)
-sys.path.append(os.path.abspath(
-    os.path.join(
-        os.path.abspath(__file__),
-        '../..')))
-from GetMediaFiles.get_media_files import GetMediaFiles
-from serialization import RenderDatum, Serialization
-from heap import Heap
+# sys.path.append(os.path.abspath(
+#     os.path.join(
+#         os.path.abspath(__file__),
+#         '../..')))
+from MediaToVideo.GetMediaFiles.get_media_files import GetMediaFiles
+from MediaToVideo.serialization import RenderDatum, Serialization
+from MediaToVideo.heap import Heap
 
 
 class MediaToVideo:
@@ -24,27 +24,24 @@ class MediaToVideo:
             renders_heap_file_path=os.path.join(os.path.dirname(__file__),
                                                 'renders_heap.bin')):
         """
-        Description:
-            Given a directory (path), get media files in path, convert &
-            concatenate into clips where the duration of each is 
-            interval_duration or the duration of the src vid, 
-            until max_duration is reached.
+        Given a directory (path), get media files in path, convert &
+        concatenate into clips where the duration of each is
+        interval_duration or the duration of the src vid,
+        until max_duration is reached.
         
-        Parameters:
-            src_path: path containing sources of media files to use in video
-            sort: value from os.stat(...) func, viable values: 
-                https://docs.python.org/3/library/os.html#os.stat_result
-            sort_reverse: Reverse after sorting; Default sorts from least to
-                greatest (oldest to newest)
-            interval_duration: duration of each image shown in the video
-            # max_duration: total length (in seconds) of the video
-            audio_index: The index used to choose the audio file from the 
-                sorted list of audio_files in the src_path for the final 
-                render
-            audio_folder: only search for songs to use in the video in this
-                folder, otherwise, search for songs in src_path
-            renders_heap_file_path: file path of the renders heap that keeps
-                track of the information of each rendered video
+        :param src_path: path containing sources of media files to use in video
+        :param sort: value from os.stat(...) func, viable values:
+            https://docs.python.org/3/library/os.html#os.stat_result
+        :param sort_reverse: Reverse after sorting; Default sorts from least to
+            greatest (oldest to newest)
+        :param interval_duration: duration of each image shown in the video
+        :param audio_index: The index used to choose the audio file from the
+            sorted list of audio_files in the src_path for the final
+            render
+        :param audio_folder: only search for songs to use in the video in this
+            folder, otherwise, search for songs in src_path
+        :param renders_heap_file_path: file path of the renders heap that keeps
+            track of the information of each rendered video
         """
         # source media to be used in final video is in this path
         self.src_path = os.path.abspath(src_path)
