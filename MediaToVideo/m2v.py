@@ -11,7 +11,8 @@ from pprint import pprint
 #     os.path.join(
 #         os.path.abspath(__file__),
 #         '../..')))
-from MediaToVideo.GetMediaFiles.get_media_files import GetMediaFiles
+from MediaToVideo.GetMediaFiles.GetMediaFiles.get_media_files \
+    import GetMediaFiles
 from MediaToVideo.serialization import RenderDatum, Serialization
 from MediaToVideo.heap import Heap
 
