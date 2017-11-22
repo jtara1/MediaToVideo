@@ -1,16 +1,9 @@
 import fire
 import os
-import sys
 import time
 from moviepy.editor import *
 from pprint import pprint
 
-# lazy way to import submodule whose path is in ../GetMediaFiles relative to
-# the file path of this file (__file__)
-# sys.path.append(os.path.abspath(
-#     os.path.join(
-#         os.path.abspath(__file__),
-#         '../..')))
 from MediaToVideo.GetMediaFiles.GetMediaFiles.get_media_files \
     import GetMediaFiles
 from MediaToVideo.serialization import RenderDatum, Serialization
@@ -19,9 +12,8 @@ from MediaToVideo.heap import Heap
 
 class MediaToVideo:
     def __init__(
-            self, src_path=os.path.dirname(os.path.abspath(__file__)),
-            sort='st_ctime', sort_reverse=False, interval_duration=8,
-            audio_index=0, audio_folder=None,
+            self, src_path, sort='st_ctime', sort_reverse=False,
+            interval_duration=8, audio_index=0, audio_folder=None,
             renders_heap_file_path=os.path.join(os.path.dirname(__file__),
                                                 'renders_heap.bin')):
         """
@@ -249,7 +241,7 @@ class MediaToVideo:
         opath = os.path.join(self.out_path, str(int(time.time())) + '.mp4')
         # pcm_s16le
         # libvorbis
-        video.write_videofile(opath, fps=30,)
+        video.write_videofile(opath, fps=30, codec="libx264")
         return opath
 
     def _concatenate_clips(self, clips, ofname='output', audio_clip=None):

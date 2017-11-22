@@ -1,1 +1,1 @@
-from MediaToVideo.m2v import MediaToVideo
+from MediaToVideo.__main__ import MediaToVideo
