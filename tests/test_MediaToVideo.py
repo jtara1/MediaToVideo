@@ -1,10 +1,29 @@
 import sys
 import os
-# sys.path.append()
+import shutil
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from MediaToVideo import MediaToVideo
 
 
+path = os.path.join(os.path.dirname(__file__), "media")
+output_path = os.path.join(path, 'output')
+
+
+def cleanup(func):
+    def run():
+        func()
+        shutil.rmtree(output_path)
+    return run
+
+
+@cleanup
 def test1():
-    path = os.path.join(os.path.dirname(__file__), "media")
-    m2v = MediaToVideo(src_path=path)
+    m2v = MediaToVideo(src_path=path,
+                       interval_duration=3,
+                       dont_load_renders_heap=True)
     m2v.render()
+    assert(len(os.listdir(output_path)) == 1)
+
+
+if __name__ == "__main__":
+    test1()

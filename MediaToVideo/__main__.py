@@ -15,7 +15,8 @@ class MediaToVideo:
             self, src_path, sort='st_ctime', sort_reverse=False,
             interval_duration=8, audio_index=0, audio_folder=None,
             renders_heap_file_path=os.path.join(os.path.dirname(__file__),
-                                                'renders_heap.bin')):
+                                                'renders_heap.bin'),
+            dont_load_renders_heap=False):
         """
         Given a directory (path), get media files in path, convert &
         concatenate into clips where the duration of each is
@@ -35,6 +36,9 @@ class MediaToVideo:
             folder, otherwise, search for songs in src_path
         :param renders_heap_file_path: file path of the renders heap that keeps
             track of the information of each rendered video
+        :param dont_load_renders_heap: if True, does not attempt to deserailize
+            the renders heap which also means it won't attempt to skip media
+            that has already been used in a render
         """
         # source media to be used in final video is in this path
         self.src_path = os.path.abspath(src_path)
@@ -81,7 +85,8 @@ class MediaToVideo:
         self.audio_index = audio_index
 
         self.renders_heap = Heap(file_path=renders_heap_file_path)
-        self.renders_heap.deserialize()  # try to load from file
+        if not dont_load_renders_heap:
+            self.renders_heap.deserialize()  # try to load from file
         if self.renders_heap.peek() is not None:
             pprint(dict(self.renders_heap.peek()), width=100)  # debug
 

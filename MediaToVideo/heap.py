@@ -42,7 +42,7 @@ class Heap:
         try:
             self.heap = Serialization.deserialize_from_binary(self.file_path)
         except (FileNotFoundError, FileExistsError):
-            print("[Heap] Warning: attempted to deserialize from file that did"
+            print("[Heap] Note: attempted to deserialize from file that did"
                   " not exist.")
 
     def __repr__(self):
