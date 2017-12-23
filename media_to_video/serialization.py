@@ -63,7 +63,7 @@ class RenderDatum(GeneralSchema):
     def __init__(self, data_file, main_key, date_created, images, videos,
                  images_range, videos_range, audio,
                  audio_index, finished_render, uploaded_to):
-        """All the data needed to be saved for a MediaToVideo render. 
+        """All the data needed to be saved for a media_to_video render. 
         Not very elegant - just passing parameters as arguments 
         for the super constructor.
         """

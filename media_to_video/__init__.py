@@ -1,0 +1,1 @@
+from media_to_video.__main__ import MediaToVideo

@@ -3,11 +3,11 @@ import os
 import time
 from moviepy.editor import *
 from pprint import pprint
+from get_media_files.get_media_files.__main__ import GetMediaFiles
 
-from MediaToVideo.GetMediaFiles.GetMediaFiles.get_media_files \
-    import GetMediaFiles
-from MediaToVideo.serialization import RenderDatum, Serialization
-from MediaToVideo.heap import Heap
+from media_to_video.media_to_video.serialization \
+    import RenderDatum, Serialization
+from media_to_video.media_to_video.heap import Heap
 
 
 class MediaToVideo:
