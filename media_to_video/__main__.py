@@ -58,15 +58,15 @@ class MediaToVideo:
         # Get list of media files with certain extension from path (sorted)
         self.src_files = GetMediaFiles(self.src_path)
         # list of files paths for each diff media type
-        self.image_files = self.src_files.get_all(
+        self.image_files = self.src_files.get_info(
             sort=sort,
             sort_reverse=sort_reverse,
             track_types=['Image'])
-        self.video_files = self.src_files.get_all(
+        self.video_files = self.src_files.get_info(
             sort=sort,
             sort_reverse=sort_reverse,
             track_types=['Video'])
-        self.sound_files = self.src_files.get_all(
+        self.sound_files = self.src_files.get_info(
             path=os.path.abspath(audio_folder)
             if audio_folder else self.src_path,
             sort=sort,
@@ -74,12 +74,12 @@ class MediaToVideo:
             track_types=['Audio']
         )
         print('songs found: ')
-        self.src_files.print_files(self.sound_files)
+        print(self.sound_files)
 
         # files that can be used in the final rendered video
         self.media_files = self.image_files + self.video_files
         print('media files that can be used from src files:')  # debug
-        self.src_files.print_files(self.media_files)  # debug
+        print(self.media_files)  # debug
 
         self.vid_time = 0  # time a clip is placed in the timeline of final vid
         self.audio_index = audio_index
