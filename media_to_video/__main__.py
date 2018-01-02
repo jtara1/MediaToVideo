@@ -4,7 +4,8 @@ import time
 from moviepy.editor import *
 from pprint import pprint
 from get_media_files import GetMediaFiles
-
+from multiprocessing import Queue
+# local imports
 from media_to_video.serialization \
     import RenderDatum, Serialization
 from media_to_video.heap import Heap
@@ -92,6 +93,15 @@ class MediaToVideo:
         self.image_files_range = [0, 0]
         self.video_files_range = [0, 0]
 
+        self._render_queue = Queue()
+
+    @property
+    def render_queue(self):
+        """When a render completes, the file_path to the rendered file will
+        be put in this `multiprocessing.Queue` object
+        """
+        return self._render_queue
+
     def render(self, continuous=False):
         """ The user using the API should call this method to render the images
         and videos from the provided path as a video based on the length of
@@ -147,6 +157,9 @@ class MediaToVideo:
         pprint(dict(datum), width=100)  # debug
         self.renders_heap.push(datum)  # store datum in heap
         self.renders_heap.serialize()  # save heap to file
+        # add to queue for multiprocessing capability
+        self._render_queue.put(render_file_path)
+
         self.vid_time = 0  # reset in case we're doing another render
 
     def _get_clips(self):
