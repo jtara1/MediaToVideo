@@ -73,13 +73,12 @@ class MediaToVideo:
             sort_reverse=sort_reverse,
             track_types=['Audio']
         )
-        print('songs found: ')
-        print(self.sound_files)
+        print('songs found:\n{}'.format(self.sound_files))
 
         # files that can be used in the final rendered video
         self.media_files = self.image_files + self.video_files
-        print('media files that can be used from src files:')  # debug
-        print(self.media_files)  # debug
+        print('media files that can be used from src files:\n{}'
+              .format(self.media_files))  # debug
 
         self.vid_time = 0  # time a clip is placed in the timeline of final vid
         self.audio_index = audio_index
@@ -116,6 +115,8 @@ class MediaToVideo:
         if datum is not None:
             if self._out_of_media(datum):
                 raise Exception("No more media available")
+            if self._get_number_of_extra_images(datum) <= 0:
+                raise Exception("Not enough media")
             self.audio_index, \
                 self.image_files_range, \
                 self.video_files_range = datum.get_next()
@@ -300,7 +301,7 @@ class MediaToVideo:
         :param datum: The datum that's about to be used to help choose the
             next media for the video render
         :type datum: serialization.RenderDatum
-        :return: True if there's not enough media, false otherwise
+        :return: True if there's not enough media, False otherwise
         """
         imgs_range = datum.data[datum.main_key]['images_range']
         vids_range = datum.data[datum.main_key]['videos_range']
@@ -308,6 +309,25 @@ class MediaToVideo:
                 vids_range[1] - vids_range[0] == 0:
             return True
         return False
+
+    def _get_number_of_extra_images(self, datum):
+        """Returns the number of images remaining after the next render
+        uses the currently available images with the next available song
+        :param datum: The datum that's about to be used to help choose the
+            next media for the video render
+        :type datum: serialization.RenderDatum
+        :return: integer of the number of images after the next render (can be
+            negative, zero, or positive)
+        """
+        audio_index = datum.data[datum.main_key]['audio_index']
+        media_file = self.sound_files[audio_index]
+        audio_duration = media_file[1]['Audio']['duration'] / 1000  # seconds
+
+        imgs_range = datum.data[datum.main_key]['images_range']
+        remaining_images = imgs_range[1] - imgs_range[0]
+
+        min_images_needed = audio_duration // self.interval_duration
+        return remaining_images - min_images_needed
 
 
 if __name__ == '__main__':
