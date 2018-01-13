@@ -314,8 +314,8 @@ class MediaToVideo:
         :type datum: serialization.RenderDatum
         :return: True if there's not enough media, False otherwise
         """
-        imgs_range = datum.data[datum.main_key]['images_range']
-        vids_range = datum.data[datum.main_key]['videos_range']
+        imgs_range = datum['images_range']
+        vids_range = datum['videos_range']
         if imgs_range[1] - imgs_range[0] == 0 and \
                 vids_range[1] - vids_range[0] == 0:
             return True
@@ -330,12 +330,12 @@ class MediaToVideo:
         :return: integer of the number of images after the next render (can be
             negative, zero, or positive)
         """
-        audio_index = datum.data[datum.main_key]['audio_index']
+        audio_index = datum['audio_index']
         media_file = self.sound_files[audio_index]
         audio_duration = media_file[1]['Audio']['duration'] / 1000  # seconds
 
-        imgs_range = datum.data[datum.main_key]['images_range']
-        vids_range = datum.data[datum.main_key]['videos_range']
+        imgs_range = datum['images_range']
+        vids_range = datum['videos_range']
 
         total_non_audio_media = len(self.image_files) + len(self.video_files)
         remaining_images = total_non_audio_media - \

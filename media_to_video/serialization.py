@@ -76,17 +76,15 @@ class RenderDatum(GeneralSchema):
 
     def get_next(self):
         """Returns next audio, image, and video index to begin at
-        :rtype: tuple of 3 integers"""
-        return (self.data[self.main_key]['audio_index'],
-                self.data[self.main_key]['images_range'],
-                self.data[self.main_key]['videos_range'])
+        :rtype: tuple of integer, list of 2 integers, list of 2 integers
+        """
+        return self['audio_index'], self['images_range'], self['videos_range']
 
     def __lt__(self, other):
         """Invert `<` operator so heapq from std lib becomes max_heap
         when used with objs of this class
         """
-        return self.data[self.main_key]['date_created'] >= \
-            other.data[other.main_key]['date_created']
+        return self['date_created'] >= other['date_created']
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -94,6 +92,9 @@ class RenderDatum(GeneralSchema):
     def __iter__(self):
         for k, v in self.data.items():
             yield k, v
+
+    def __getitem__(self, item):
+        return self.data[self.main_key][item]
 
 
 if __name__ == '__main__':
@@ -103,7 +104,7 @@ if __name__ == '__main__':
 
         ss = RenderDatum(
             data_file=path,
-            main_key='video.mp4',
+            main_key='/path/to/video.mp4',
             date_created=time.time(),
             images=['pic.png', 'pic2.jpg'],
             videos=['vid.mp4'],
@@ -116,5 +117,7 @@ if __name__ == '__main__':
         )
         ss.serialize()
         ss.deserialize()
+        print(ss['audio'])
+        print(ss.get_next())
 
     test()
