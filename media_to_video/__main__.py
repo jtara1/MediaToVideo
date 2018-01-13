@@ -1,10 +1,12 @@
 import fire
 import os
-import time
+from os.path import dirname, join
 from moviepy.editor import *
-from pprint import pprint
+from pprint import pprint, pformat
 from get_media_files import GetMediaFiles
 from multiprocessing import Queue
+import logging
+import time
 # local imports
 from media_to_video.serialization \
     import RenderDatum, Serialization
@@ -15,8 +17,7 @@ class MediaToVideo:
     def __init__(
             self, src_path, sort='st_ctime', sort_reverse=False,
             interval_duration=8, audio_index=0, audio_folder=None,
-            renders_heap_file_path=os.path.join(os.path.dirname(__file__),
-                                                'renders_heap.bin'),
+            renders_heap_file_path=join(dirname(__file__), 'renders_heap.bin'),
             dont_load_renders_heap=False):
         """
         Given a directory (path), get media files in path, convert &
@@ -41,6 +42,11 @@ class MediaToVideo:
             the renders heap which also means it won't attempt to skip media
             that has already been used in a render
         """
+        logging.basicConfig(filename="{}.log".format(__class__.__name__),
+                            format="%(asctime)s %(message)s",
+                            level=logging.DEBUG)
+        self.log = logging.getLogger(__class__.__name__)
+
         # source media to be used in final video is in this path
         self.src_path = os.path.abspath(src_path)
 
@@ -74,12 +80,12 @@ class MediaToVideo:
             sort_reverse=sort_reverse,
             track_types=['Audio']
         )
-        print('songs found:\n{}'.format(self.sound_files))
+        print('number of songs found: {}'.format(len(self.sound_files)))
 
         # files that can be used in the final rendered video
         self.media_files = self.image_files + self.video_files
-        print('media files that can be used from src files:\n{}'
-              .format(self.media_files))  # debug
+        print('number of non-audio-only media files found: {}'
+              .format(len(self.media_files)))
 
         self.vid_time = 0  # time a clip is placed in the timeline of final vid
         self.audio_index = audio_index
@@ -126,7 +132,7 @@ class MediaToVideo:
             if self._out_of_media(datum):
                 raise Exception("No more media available")
             if self._get_number_of_extra_images(datum) <= 0:
-                raise Exception("Not enough media")
+                raise Exception("Not enough non-audio media.")
             self.audio_index, \
                 self.image_files_range, \
                 self.video_files_range = datum.get_next()
@@ -154,7 +160,7 @@ class MediaToVideo:
                 videos_range=self.video_files_range,
                 finished_render=True, uploaded_to=[]
                 )
-        pprint(dict(datum), width=100)  # debug
+        self.log.debug(pformat(dict(datum), width=500))  # debug
         self.renders_heap.push(datum)  # store datum in heap
         self.renders_heap.serialize()  # save heap to file
         # add to queue for multiprocessing capability
@@ -187,10 +193,6 @@ class MediaToVideo:
                     )
                 self.vid_time += self.interval_duration
             else:
-                # keep the index pointing to the index of the last media
-                # file used
-                # if i + 1 == len(self.video_files):
-                #     i -= 1
                 break
 
         self.image_files_range = [image_index, last_index]
@@ -222,10 +224,6 @@ class MediaToVideo:
                     )
                 self.vid_time += src_clip_duration
             else:
-                # keep the index pointing to the index of the last media
-                # file used
-                # if i + 1 == len(self.video_files):
-                #     i -= 1
                 break
 
         self.video_files_range = [video_index, last_index]
@@ -338,6 +336,15 @@ class MediaToVideo:
 
         imgs_range = datum.data[datum.main_key]['images_range']
         remaining_images = imgs_range[1] - imgs_range[0]
+        self.log.info(
+            "checking for number of extra images: audio_index = {}; "
+            "images_range = [{}, {}); number of audio files = {}; "
+            "number of non-audio files = {}"
+                .format(audio_index,
+                        imgs_range[0],
+                        imgs_range[1],
+                        len(self.sound_files),
+                        len(self.image_files) + len(self.video_files)))
 
         min_images_needed = audio_duration // self.interval_duration
         return remaining_images - min_images_needed

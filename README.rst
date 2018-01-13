@@ -68,3 +68,18 @@ writes them to a file using GetMedia class and moviepy module.
 Input: list of files (path)
 
 Output: renders and saves the output video in a folder called `output` relative to where the input path is
+
+
+Usage
+-----
+
+Check cli options with `python3 media_to_video` which runs the __main__.py
+The cli uses fire module so you need to call the method render to render after
+the arguments for MediaToVideo are given.
+
+::
+    python3 media_to_video --src-path /home/user/media_files render
+
+    python3 media_to_video --src-path /home/user/media_files render --continuous True
+
+    python3 media_to_video --src-path /home/user/media_files --dont_load_renders_heap True render --continuous True
