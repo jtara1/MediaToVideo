@@ -160,7 +160,7 @@ class MediaToVideo:
                 videos_range=self.video_files_range,
                 finished_render=True, uploaded_to=[]
                 )
-        self.log.debug(pformat(dict(datum), width=500))  # debug
+        self.log.debug(pformat(dict(datum), width=150))  # debug
         self.renders_heap.push(datum)  # store datum in heap
         self.renders_heap.serialize()  # save heap to file
         # add to queue for multiprocessing capability
@@ -335,16 +335,21 @@ class MediaToVideo:
         audio_duration = media_file[1]['Audio']['duration'] / 1000  # seconds
 
         imgs_range = datum.data[datum.main_key]['images_range']
-        remaining_images = imgs_range[1] - imgs_range[0]
+        vids_range = datum.data[datum.main_key]['videos_range']
+
+        total_non_audio_media = len(self.image_files) + len(self.video_files)
+        remaining_images = total_non_audio_media - \
+            imgs_range[1] + vids_range[1]
+
         self.log.info(
             "checking for number of extra images: audio_index = {}; "
             "images_range = [{}, {}); number of audio files = {}; "
-            "number of non-audio files = {}"
+            "number of non-audio-only files = {}"
                 .format(audio_index,
                         imgs_range[0],
                         imgs_range[1],
                         len(self.sound_files),
-                        len(self.image_files) + len(self.video_files)))
+                        total_non_audio_media))
 
         min_images_needed = audio_duration // self.interval_duration
         return remaining_images - min_images_needed
