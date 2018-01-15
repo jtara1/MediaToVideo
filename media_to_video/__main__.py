@@ -1,3 +1,5 @@
+import traceback
+import sys
 import fire
 import os
 from os.path import dirname, join
@@ -119,7 +121,8 @@ class MediaToVideo:
                 try:
                     self._render()
                 except (KeyboardInterrupt, IndexError, Exception) as e:
-                    print("{}: {}".format(type(e).__name__, e.args))
+                    # print("{}: {}".format(type(e).__name__, e.args))
+                    traceback.print_exc(file=sys.stdout)
                     break
         else:
             self._render()
