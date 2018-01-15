@@ -19,7 +19,7 @@ class MediaToVideo:
     def __init__(
             self, src_path, sort='st_ctime', sort_reverse=False,
             interval_duration=8, audio_index=0, audio_folder=None,
-            renders_heap_file_path=join(dirname(__file__), 'renders_heap.bin'),
+            renders_heap_file_path=None,
             dont_load_renders_heap=False):
         """
         Given a directory (path), get media files in path, convert &
@@ -39,7 +39,8 @@ class MediaToVideo:
         :param audio_folder: only search for songs to use in the video in this
             folder, otherwise, search for songs in src_path
         :param renders_heap_file_path: file path of the renders heap that keeps
-            track of the information of each rendered video
+            track of the information of each rendered video, defaults to a bin
+            file stored in the src_path
         :param dont_load_renders_heap: if True, does not attempt to deserailize
             the renders heap which also means it won't attempt to skip media
             that has already been used in a render
@@ -92,7 +93,10 @@ class MediaToVideo:
         self.vid_time = 0  # time a clip is placed in the timeline of final vid
         self.audio_index = audio_index
 
-        self.renders_heap = Heap(file_path=renders_heap_file_path)
+        heap_fp = renders_heap_file_path if renders_heap_file_path is not None\
+            else join(self.src_path, 'renders_heap.bin')
+        self.renders_heap = Heap(file_path=heap_fp)
+
         if not dont_load_renders_heap:
             self.renders_heap.deserialize()  # try to load from file
         if self.renders_heap.peek() is not None:
