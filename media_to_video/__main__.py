@@ -16,11 +16,15 @@ from media_to_video.heap import Heap
 
 
 class MediaToVideo:
+    relative_output_directory = '_output'  # like '/home/user/src_path/_output'
+    renders_heap_file_name = 'renders_heap.bin'  # stores metadata of renders
+
     def __init__(
             self, src_path, sort='st_ctime', sort_reverse=False,
             interval_duration=8, audio_index=0, audio_folder=None,
             renders_heap_file_path=None,
-            dont_load_renders_heap=False):
+            dont_load_renders_heap=False,
+            output_width=1920, output_height=1080):
         """
         Given a directory (path), get media files in path, convert &
         concatenate into clips where the duration of each is
@@ -54,7 +58,8 @@ class MediaToVideo:
         self.src_path = os.path.abspath(src_path)
 
         # output files stored here
-        self.out_path = os.path.join(self.src_path, 'output')
+        self.out_path = os.path.join(self.src_path,
+                                     self.relative_output_directory)
         Serialization.make_paths_for_file(self.out_path, is_file=False)
 
         # duration of each media file in video
@@ -62,8 +67,8 @@ class MediaToVideo:
         # maximum duration allowed - determined by length of audio file
         self.max_duration = None
 
-        self.owidth = 1920  # output width
-        self.oheight = 1080  # output height
+        self.owidth = output_width  # output width
+        self.oheight = output_height  # output height
 
         # Get list of media files with certain extension from path (sorted)
         self.src_files = GetMediaFiles(self.src_path)
@@ -94,7 +99,7 @@ class MediaToVideo:
         self.audio_index = audio_index
 
         heap_fp = renders_heap_file_path if renders_heap_file_path is not None\
-            else join(self.src_path, 'renders_heap.bin')
+            else join(self.src_path, self.renders_heap_file_name)
         self.renders_heap = Heap(file_path=heap_fp)
 
         if not dont_load_renders_heap:
