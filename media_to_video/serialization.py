@@ -94,6 +94,8 @@ class RenderDatum(GeneralSchema):
             yield k, v
 
     def __getitem__(self, item):
+        if item == 'main_key':
+            return self.main_key
         return self.data[self.main_key][item]
 
 

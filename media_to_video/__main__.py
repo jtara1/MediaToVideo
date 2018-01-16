@@ -13,6 +13,7 @@ import time
 from media_to_video.serialization \
     import RenderDatum, Serialization
 from media_to_video.heap import Heap
+from media_to_video.exception import M2VException
 
 
 class MediaToVideo:
@@ -129,10 +130,14 @@ class MediaToVideo:
             while True:
                 try:
                     self._render()
-                except (KeyboardInterrupt, IndexError, Exception) as e:
-                    # print("{}: {}".format(type(e).__name__, e.args))
+                except (KeyboardInterrupt, M2VException) as e:
+                    print("{}: {}".format(type(e).__name__, e.args))
+                    break
+                except IndexError:
                     traceback.print_exc(file=sys.stdout)
                     break
+                finally:
+                    self._render_queue.put(self.renders_heap.peek().main_key)
         else:
             self._render()
 
@@ -142,9 +147,9 @@ class MediaToVideo:
 
         if datum is not None:
             if self._out_of_media(datum):
-                raise Exception("No more media available")
+                raise M2VException("No more media available")
             if self._get_number_of_extra_images(datum) <= 0:
-                raise Exception("Not enough non-audio media.")
+                raise M2VException("Not enough images or videos.")
             self.audio_index, \
                 self.image_files_range, \
                 self.video_files_range = datum.get_next()
@@ -249,15 +254,15 @@ class MediaToVideo:
             return AudioFileClip(self.sound_files[self.audio_index][0])\
                 .set_start(0)\
                 .volumex(1)
-        except IndexError:
-            raise IndexError("No more audio files available")
+        except M2VException:
+            raise M2VException("No more audio files available")
 
     def _composite_clips(self, clips, ofname='output', audio_clip=None):
         """ Renders and saves video made of clips from self._get_clips(...) 
         :returns opath: output_path of video file rendered 
         """
         if len(clips) == 0:
-            raise IndexError("No more images or videos available")
+            raise M2VException("No more images or videos available")
 
         video = CompositeVideoClip(clips, size=(self.owidth, self.oheight))
 
