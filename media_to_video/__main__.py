@@ -82,14 +82,14 @@ class MediaToVideo:
             sort=sort,
             sort_reverse=sort_reverse,
             track_types=['Video'])
-        self.sound_files = self.src_files.get_info(
+        self.audio_files = self.src_files.get_info(
             path=os.path.abspath(audio_folder)
             if audio_folder else self.src_path,
             sort=sort,
             sort_reverse=sort_reverse,
             track_types=['Audio']
         )
-        print('number of songs found: {}'.format(len(self.sound_files)))
+        print('number of songs found: {}'.format(len(self.audio_files)))
 
         # files that can be used in the final rendered video
         self.media_files = self.image_files + self.video_files
@@ -171,7 +171,7 @@ class MediaToVideo:
                 date_created=os.stat(render_file_path).st_ctime,
                 images=self._image_files_used(),
                 videos=self._video_files_used(),
-                audio=self.sound_files[self.audio_index],
+                audio=self.audio_files[self.audio_index],
                 audio_index=self.audio_index + 1,
                 images_range=self.image_files_range,
                 videos_range=self.video_files_range,
@@ -251,7 +251,7 @@ class MediaToVideo:
         given
         """
         try:
-            return AudioFileClip(self.sound_files[self.audio_index][0])\
+            return AudioFileClip(self.audio_files[self.audio_index][0])\
                 .set_start(0)\
                 .volumex(1)
         except M2VException:
@@ -348,7 +348,10 @@ class MediaToVideo:
             negative, zero, or positive)
         """
         audio_index = datum['audio_index']
-        media_file = self.sound_files[audio_index]
+        try:
+            media_file = self.audio_files[audio_index]
+        except IndexError:
+            raise M2VException("Not enough audio_files")
         audio_duration = media_file[1]['Audio']['duration'] / 1000  # seconds
 
         imgs_range = datum['images_range']
@@ -365,7 +368,7 @@ class MediaToVideo:
                 .format(audio_index,
                         imgs_range[0],
                         imgs_range[1],
-                        len(self.sound_files),
+                        len(self.audio_files),
                         total_non_audio_media))
 
         min_images_needed = audio_duration // self.interval_duration
