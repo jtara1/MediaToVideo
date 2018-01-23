@@ -14,6 +14,7 @@ from media_to_video.serialization \
     import RenderDatum, Serialization
 from media_to_video.heap import Heap
 from media_to_video.exception import M2VException
+from media_to_video.utility import get_slugified_datetime_now
 
 
 class MediaToVideo:
@@ -272,7 +273,8 @@ class MediaToVideo:
 
         video.audio = audio_clip
 
-        opath = os.path.join(self.out_path, str(int(time.time())) + '.mp4')
+        opath = os.path.join(self.out_path,
+                             get_slugified_datetime_now() + '.mp4')
         # pcm_s16le
         # libvorbis
         video.write_videofile(opath, fps=30, codec="libx264")
