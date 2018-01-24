@@ -137,8 +137,8 @@ class MediaToVideo:
                 except IndexError:
                     traceback.print_exc(file=sys.stdout)
                     break
-                finally:
-                    self._render_queue.put(self.renders_heap.peek().main_key)
+                # put file_path to successfully rendered video into the queue
+                self._render_queue.put(self.renders_heap.peek().main_key)
         else:
             self._render()
 
@@ -181,9 +181,6 @@ class MediaToVideo:
         self.log.debug(pformat(dict(datum), width=150))  # debug
         self.renders_heap.push(datum)  # store datum in heap
         self.renders_heap.serialize()  # save heap to file
-        # add to queue for multiprocessing capability
-        self._render_queue.put(render_file_path)
-
         self.vid_time = 0  # reset in case we're doing another render
 
     def _get_clips(self):
