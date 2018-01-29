@@ -20,7 +20,7 @@ def test1():
     m2v = MediaToVideo(src_path=path,
                        interval_duration=3,
                        dont_load_renders_heap=True)
-    m2v.render(True)
+    m2v.render()
     assert(m2v.render_queue.qsize() == 1)
     assert(len(os.listdir(output_path)) == 1)
 

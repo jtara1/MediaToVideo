@@ -121,14 +121,22 @@ class MediaToVideo:
         """
         return self._render_queue
 
-    def render(self, continuous=False):
+    def render(self, limit=1):
         """ The user using the API should call this method to render the images
         and videos from the provided path as a video based on the length of
         the audio file used in self._get_audio_file().
-        :param continuous: continuously render a video with the media available
+        :param limit: maximum number of video to render; -1 implies endless
         """
-        if continuous:
-            while True:
+        def continuation_generator(length):
+            if length == -1:
+                while True:
+                    yield True
+            for _ in range(length):
+                yield True
+
+        limit_generator = continuation_generator(limit)
+        try:
+            while next(limit_generator):
                 try:
                     self._render()
                 except (KeyboardInterrupt, M2VException) as e:
@@ -139,8 +147,9 @@ class MediaToVideo:
                     break
                 # put file_path to successfully rendered video into the queue
                 self._render_queue.put(self.renders_heap.peek().main_key)
-        else:
-            self._render()
+        except StopIteration:
+            print("Rendered {} videos"
+                  .format(limit if limit != -1 else "all"))
 
     def _render(self):
         """Render a single video"""
