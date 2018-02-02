@@ -107,7 +107,7 @@ class MediaToVideo:
         if not dont_load_renders_heap:
             self.renders_heap.deserialize()  # try to load from file
         if self.renders_heap.peek() is not None:
-            pprint(dict(self.renders_heap.peek()), width=100)  # debug
+            self.log.debug(pformat(dict(self.renders_heap.peek())))
 
         self.image_files_range = [0, 0]
         self.video_files_range = [0, 0]
