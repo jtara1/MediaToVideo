@@ -3,6 +3,7 @@ import os
 import shutil
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from media_to_video import MediaToVideo
+from pprint import pprint
 
 path = os.path.join(os.path.dirname(__file__), "media")
 output_path = os.path.join(path, MediaToVideo.relative_output_directory)
@@ -23,6 +24,7 @@ def test1():
     m2v.render()
     assert(m2v.render_queue.qsize() == 1)
     assert(len(os.listdir(output_path)) == 1)
+    pprint(m2v.render_queue.get())
 
 
 if __name__ == "__main__":

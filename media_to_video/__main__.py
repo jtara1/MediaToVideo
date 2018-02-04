@@ -19,7 +19,7 @@ from media_to_video.utility import get_slugified_datetime_now
 
 class MediaToVideo:
     relative_output_directory = '_output'  # like '/home/user/src_path/_output'
-    renders_heap_file_name = 'renders_heap.bin'  # stores metadata of renders
+    renders_heap_file_name = '_renders_heap.bin'  # stores metadata of renders
 
     def __init__(
             self, src_path, sort='st_ctime', sort_reverse=False,
@@ -51,10 +51,13 @@ class MediaToVideo:
             the renders heap which also means it won't attempt to skip media
             that has already been used in a render
         """
-        logging.basicConfig(filename="{}.log".format(__class__.__name__),
-                            format="%(asctime)s %(message)s",
-                            level=logging.DEBUG)
+        # setup logging
         self.log = logging.getLogger(__class__.__name__)
+        handler = logging.StreamHandler(stream=sys.stdout)
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(logging.Formatter("[%(name)s] %(levelname)s "
+                                               "%(asctime)s %(message)s"))
+        self.log.addHandler(handler)
 
         # source media to be used in final video is in this path
         self.src_path = os.path.abspath(src_path)
@@ -146,7 +149,10 @@ class MediaToVideo:
                     traceback.print_exc(file=sys.stdout)
                     break
                 # put file_path to successfully rendered video into the queue
-                self._render_queue.put(self.renders_heap.peek().main_key)
+                self._render_queue.put(
+                    (self.renders_heap.peek().main_key,
+                     dict(self.renders_heap.peek().data))
+                )
         except StopIteration:
             print("Rendered {} videos"
                   .format(limit if limit != -1 else "all"))
