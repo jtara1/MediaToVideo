@@ -148,11 +148,13 @@ class MediaToVideo:
                 except IndexError:
                     traceback.print_exc(file=sys.stdout)
                     break
+
+                # file path of rendered video
+                fp = self.renders_heap.peek().main_key
                 # put file_path to successfully rendered video into the queue
                 self._render_queue.put(
-                    (self.renders_heap.peek().main_key,
-                     dict(self.renders_heap.peek().data))
-                )
+                    (fp,
+                     dict(self.renders_heap.peek().data[fp])))
         except StopIteration:
             print("Rendered {} videos"
                   .format(limit if limit != -1 else "all"))
