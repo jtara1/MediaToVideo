@@ -11,7 +11,8 @@ output_path = os.path.join(path, MediaToVideo.relative_output_directory)
 
 def cleanup_old_tests(func):
     def run():
-        shutil.rmtree(output_path)
+        if os.path.isdir(output_path):
+            shutil.rmtree(output_path)
         func()
     return run
 
